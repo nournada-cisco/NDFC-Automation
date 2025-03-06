@@ -1,0 +1,80 @@
+# ------------------------------------------------------------------------------
+# Interface Group Management for Cisco NDFC
+# ------------------------------------------------------------------------------
+# This task file manages the creation of interface groups and network associations 
+# within the Cisco NDFC environment. It consists of the following steps:
+#
+# 1. **Create Interface Groups** (`create_interface_group.yml`) – Defines 
+#    interface groups in NDFC (vPC, Ethernet, Port-Channels).
+# 2. **Associate Networks** (`create_network_association.yml`) – Associates 
+#    networks with their respective interface groups.
+#
+# This role uses `dcnm_rest` for API interactions with NDFC.
+# ------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------- #
+# Task: Debug Role Execution                                       #
+# ---------------------------------------------------------------- #
+# Displays a message indicating that the `create_interface_groups` role has started.
+
+- ansible.builtin.debug:
+    msg:
+      - "----------------------------------------------------------------"
+      - "+             Calling Role - [create_interface_groups]         +"
+      - "----------------------------------------------------------------"
+  tags:
+    - create_groups
+    - associate_networks
+
+# ---------------------------------------------------------------- #
+# Task: Create Interface Groups                                   #
+# ---------------------------------------------------------------- #
+# Calls the `create_interface_group.yml` task to define interface groups in NDFC.
+
+- name: Create Interface Group
+  ansible.builtin.import_tasks: create_interface_group.yml
+  tags:
+    - create_groups
+
+# ---------------------------------------------------------------- #
+# Task: Associate Networks with Interface Groups                  #
+# ---------------------------------------------------------------- #
+# Calls `create_network_association.yml` to link networks with their 
+# respective interface groups.
+
+- name: Associate Networks with Interface Groups
+  ansible.builtin.import_tasks: create_network_association.yml
+  tags:
+    - associate_networks
+
+
+
+
+
+
+
+
+# - ansible.builtin.debug:
+#     msg:
+#       - "----------------------------------------------------------------"
+#       - "+             Calling Role - [create_interface_groups]               +"
+#       - "----------------------------------------------------------------"
+#   tags:
+#     - create_groups
+#     - associate_networks
+
+# - name: Authenticate and Get Token
+#   ansible.builtin.import_tasks: get_ndfc_token.yml
+#   tags:
+#     - create_groups
+#     - associate_networks
+
+# - name: Create Interface Group
+#   ansible.builtin.import_tasks: create_interface_group.yml
+#   tags:
+#     - create_groups
+
+# - name: Associate Networks with Interface Groups
+#   ansible.builtin.import_tasks: create_network_association.yml
+#   tags:
+#     - associate_networks

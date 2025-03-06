@@ -1,0 +1,364 @@
+---
+# This file is auto-generated
+# DO NOT EDIT MANUALLY
+#
+- net_name: l2ext-svc-cp
+  vrf_name: mgs-in
+  net_id: 201100
+  vlan_id: 1100
+  vlan_name: svc-cp
+  gw_ip_subnet: 10.67.0.1/26
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-svc-worker
+  vrf_name: mgs-in
+  net_id: 210111
+  vlan_id: 111
+  vlan_name: svc-worker
+  gw_ip_subnet: 10.64.136.129/26
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-svc-sdc-data-1
+  vrf_name: infra
+  net_id: 210103
+  vlan_id: 103
+  vlan_name: svc-sdc-data-1
+  gw_ip_subnet: 10.64.70.1/26
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-svc-sdc-data-2
+  vrf_name: infra
+  net_id: 210105
+  vlan_id: 105
+  vlan_name: svc-sdc-data-2
+  gw_ip_subnet: 10.64.71.1/26
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-hsm-mgmt
+  vrf_name: mgs-in
+  net_id: 210114
+  vlan_id: 114
+  vlan_name: hsm-mgmt
+  gw_ip_subnet: 10.64.136.1/27
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-hsm-data
+  vrf_name: mgs-in
+  net_id: 210115
+  vlan_id: 115
+  vlan_name: hsm-data
+  gw_ip_subnet: 10.64.136.33/27
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-svc-obs-mgmt
+  vrf_name: mgs-in
+  net_id: 210116
+  vlan_id: 116
+  vlan_name: svc-obs-mgmt
+  gw_ip_subnet: 10.64.136.65/28
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-svc-idm
+  vrf_name: mgs-in
+  net_id: 210113
+  vlan_id: 113
+  vlan_name: svc-idm
+  gw_ip_subnet: 10.64.136.97/28
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: l2ext-rhoso-ocp-cp
+  vrf_name: mgs-in
+  net_id: 201101
+  vlan_id: 1101
+  vlan_name: rhoso-ocp-cp
+  gw_ip_subnet: 10.67.0.65/26
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-rhoso-ocp-worker
+  vrf_name: mgs-in
+  net_id: 210112
+  vlan_id: 112
+  vlan_name: rhoso-ocp-worker
+  gw_ip_subnet: 10.64.136.193/26
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-rhoso-sdc-data-1
+  vrf_name: infra
+  net_id: 210104
+  vlan_id: 104
+  vlan_name: rhoso-sdc-data-1
+  gw_ip_subnet: 10.64.70.65/26
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-rhoso-sdc-data-2
+  vrf_name: infra
+  net_id: 210106
+  vlan_id: 106
+  vlan_name: rhoso-sdc-data-2
+  gw_ip_subnet: 10.64.71.65/26
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: l2ext-osp-mgmt-cp
+  vrf_name: mgs-in
+  net_id: 201102
+  vlan_id: 1102
+  vlan_name: osp-mgmt-cp
+  gw_ip_subnet: 10.67.1.1/24
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: l2ext-osp-mgmt-int-api
+  vrf_name: mgs-in
+  net_id: 201103
+  vlan_id: 1103
+  vlan_name: osp-mgmt-int-api
+  gw_ip_subnet: 10.67.2.1/23
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: l2ext-osp-mgmt-tenant
+  vrf_name: infra
+  net_id: 201104
+  vlan_id: 1104
+  vlan_name: osp-mgmt-tenant
+  gw_ip_subnet: 10.67.35.1/24
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: l2ext-osp-mgmt-log-forward
+  vrf_name: infra
+  net_id: 201106
+  vlan_id: 1106
+  vlan_name: osp-mgmt-log-forward
+  gw_ip_subnet: 10.67.33.1/24
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: l2ext-osp-mgmt-trilio-backup
+  vrf_name: infra
+  net_id: 201107
+  vlan_id: 1107
+  vlan_name: osp-mgmt-trilio-backup
+  gw_ip_subnet: 10.67.34.1/24
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-osp-nws-cp
+  vrf_name: infra
+  net_id: 210260
+  vlan_id: 260
+  vlan_name: osp-nws-cp
+  gw_ip_subnet: 10.64.80.1/27
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-osp-nws-int-api
+  vrf_name: infra
+  net_id: 210261
+  vlan_id: 261
+  vlan_name: osp-nws-int-api
+  gw_ip_subnet: 10.64.80.33/27
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-osp-nws-tenant
+  vrf_name: infra
+  net_id: 210262
+  vlan_id: 262
+  vlan_name: osp-nws-tenant
+  gw_ip_subnet: 10.64.80.65/27
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-osp-nws-trilio-backup
+  vrf_name: infra
+  net_id: 210263
+  vlan_id: 263
+  vlan_name: osp-nws-trilio-backup
+  gw_ip_subnet: 10.64.80.97/27
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-osp-nws-log-forward
+  vrf_name: infra
+  net_id: 210264
+  vlan_id: 264
+  vlan_name: osp-nws-log-forward
+  gw_ip_subnet: 10.64.80.129/27
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: l2ext-osp-internet
+  vrf_name: internet
+  net_id: 201500
+  vlan_id: 1500
+  vlan_name: osp-internet
+  gw_ip_subnet: 77.242.253.1/24
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-osp-com-cp
+  vrf_name: infra
+  net_id: 210202
+  vlan_id: 202
+  vlan_name: osp-com-cp
+  gw_ip_subnet: 10.64.0.1/22
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-osp-com-int-api
+  vrf_name: infra
+  net_id: 210203
+  vlan_id: 203
+  vlan_name: osp-com-int-api
+  gw_ip_subnet: 10.64.4.1/22
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-osp-com-tenant
+  vrf_name: infra
+  net_id: 210204
+  vlan_id: 204
+  vlan_name: osp-com-tenant
+  gw_ip_subnet: 10.64.8.1/22
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-osp-sdc-data-1
+  vrf_name: infra
+  net_id: 210200
+  vlan_id: 200
+  vlan_name: osp-sdc-data-1
+  gw_ip_subnet: 10.64.72.1/22
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-osp-sdc-data-2
+  vrf_name: infra
+  net_id: 210201
+  vlan_id: 201
+  vlan_name: osp-sdc-data-2
+  gw_ip_subnet: 10.64.76.1/22
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-osp-com-trilio-backup
+  vrf_name: infra
+  net_id: 210205
+  vlan_id: 205
+  vlan_name: osp-com-trilio-backup
+  gw_ip_subnet: 10.64.12.1/22
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false
+- net_name: aead3-osp-com-log-forward
+  vrf_name: infra
+  net_id: 210206
+  vlan_id: 206
+  vlan_name: osp-com-log-forward
+  gw_ip_subnet: 10.64.16.1/22
+  attach:
+    - ip_address: 10.105.11.51
+      ports: ['Port-channel10']
+    - ip_address: 10.105.11.52
+      ports: ['Port-channel10']
+  deploy: false

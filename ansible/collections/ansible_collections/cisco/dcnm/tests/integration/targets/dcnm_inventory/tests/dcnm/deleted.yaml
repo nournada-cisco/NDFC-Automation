@@ -1,0 +1,143 @@
+##############################################
+##                 SETUP                    ##
+##############################################
+
+- set_fact:
+    rest_path: "/rest/control/fabrics/{{ ansible_it_fabric }}"
+  when: controller_version == "11"
+
+- set_fact:
+    rest_path: "/appcenter/cisco/ndfc/api/v1/lan-fabric/rest/control/fabrics/{{ ansible_it_fabric }}"
+  when: controller_version >= "12"
+
+- name: DELETED - Verify if fabric is deployed.
+  cisco.dcnm.dcnm_rest:
+    method: GET
+    path: "{{ rest_path }}"
+  register: result
+
+- assert:
+    that:
+    - 'result.response.DATA != None'
+
+- name: DELETED - setup - Clean up any existing devices
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: deleted
+
+- name: DELETED - Merge a Switch using GreenField Deployment
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: merged
+    config:
+    - seed_ip: "{{ ansible_switch1 }}"
+      auth_proto: MD5 # choose from [MD5, SHA, MD5_DES, MD5_AES, SHA_DES, SHA_AES]
+      user_name: "{{ switch_username }}"
+      password: "{{ switch_password }}"
+      max_hops: 0
+      role: leaf # default is Leaf - choose from [Leaf, Spine, Border, Border Spine, Border Gateway, Border Gateway Spine
+                       # Super Spine, Border Super Spine, Border Gateway Super Spine]
+      preserve_config: False # boolean, default is  true
+  register: result
+
+- assert:
+    that:
+    - 'result.changed == true'
+
+- assert:
+    that:
+      - 'item["RETURN_CODE"] == 200'
+  loop: '{{ result.response }}'
+
+#############################################
+#                DELETED                   ##
+#############################################
+
+- name: DELETED - Delete a Switch
+  cisco.dcnm.dcnm_inventory: &conf_del
+    fabric: "{{ ansible_it_fabric }}"
+    state: deleted
+    config:
+    - seed_ip: "{{ ansible_switch1 }}"
+  register: result
+
+- assert:
+    that:
+    - 'result.changed == true'
+    - 'result.response[0].RETURN_CODE == 200'
+
+- name: DELETED - conf1 - DEL - Idempotence
+  cisco.dcnm.dcnm_inventory: *conf_del
+  register: result
+
+- assert:
+    that:
+    - 'result.changed == false'
+    - 'result.response == "The switch provided is not part of the fabric and cannot be deleted"'
+
+- name: DELETED - Merge a Switch using BrownField Deployment
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: merged
+    config:
+    - seed_ip: "{{ ansible_switch1 }}"
+      auth_proto: MD5 # choose from [MD5, SHA, MD5_DES, MD5_AES, SHA_DES, SHA_AES]
+      user_name: "{{ switch_username }}"
+      password: "{{ switch_password }}"
+      max_hops: 0
+      role: leaf # default is Leaf - choose from [Leaf, Spine, Border, Border Spine, Border Gateway, Border Gateway Spine
+                       # Super Spine, Border Super Spine, Border Gateway Super Spine]
+      preserve_config: True # boolean, default is  true
+  register: result
+
+- assert:
+    that:
+    - 'result.changed == true'
+
+- assert:
+    that:
+      - 'item["RETURN_CODE"] == 200'
+  loop: '{{ result.response }}'
+
+- name: DELETED - Delete all Switch without config element
+  cisco.dcnm.dcnm_inventory: &conf_del_all
+    fabric: "{{ ansible_it_fabric }}"
+    state: deleted
+  register: result
+
+- assert:
+    that:
+    - 'result.changed == true'
+    - 'result.response[0].RETURN_CODE == 200'
+
+- name: DELETED - conf1 - DEL ALL - Idempotence
+  cisco.dcnm.dcnm_inventory: *conf_del_all
+  register: result
+
+- assert:
+    that:
+    - 'result.changed == false'
+    - 'result.response == "The switch provided is not part of the fabric and cannot be deleted"'
+
+- name: DELETED - Delete a Switch without seed_ip
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: deleted
+    config:
+    - seed_ip:
+  register: result
+  ignore_errors: yes
+
+- assert:
+    that:
+    - 'result.changed == false'
+    - '"Invalid parameters in playbook: seed_ip : Required parameter not found" in result.msg'
+
+##############################################
+##                 CLEAN-UP                 ##
+##############################################
+
+- name: DELETED - setup - Clean up any existing devices
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: deleted

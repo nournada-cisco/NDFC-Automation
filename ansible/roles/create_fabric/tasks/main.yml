@@ -1,0 +1,38 @@
+#SPDX-License-Identifier: MIT-0
+---
+# ------------------------------------------------------------------------------
+# Create Fabric Task File for NDFC Automation
+# ------------------------------------------------------------------------------
+# This file contains the tasks required to create and configure a fabric 
+# in Cisco NDFC.
+#
+# It includes:
+# - **Fabric Name Reference**: Retrieves the fabric name from `group_vars/staging/fabric.yml`
+# - **Debugging Information**: Outputs debug messages when executing this role.
+# - **Fabric Management Tasks**: Calls the `manage_fabric.yml` task file to 
+#   handle the actual creation and configuration of the fabric.
+#
+# This ensures that the fabric is properly initialized before deploying 
+# additional configurations such as overlays and device provisioning.
+# ------------------------------------------------------------------------------
+
+- name: Role Entry Point - [create_fabric]
+  ansible.builtin.debug:
+    msg:
+      - "----------------------------------------------------------------"
+      - "+             Calling Role - [create_fabric]                   +"
+      - "----------------------------------------------------------------"
+  tags:
+    - cf_vxlan      # Applies to VXLAN fabric creation
+    - cf_all        # Applies to all fabric-related tasks
+
+
+# ---------------------------------------------------------------- #
+# Task: Include Fabric Creation Tasks                              #
+# ---------------------------------------------------------------- #
+- name: Include Tasks To Create Fabric
+  ansible.builtin.import_tasks: manage_fabric.yml
+  tags:
+    - cf_vxlan
+    - cf_all
+

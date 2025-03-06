@@ -1,0 +1,29 @@
+---
+# ------------------------------------------------------------------------------
+# Host-Facing Interface Configuration
+# ------------------------------------------------------------------------------
+# This task file is responsible for provisioning **host-facing interfaces**
+# on Leaf switches within the NDFC-managed fabric.
+#
+# Actions performed:
+# 1. **Creates Access Interfaces** on the designated leaf switches.
+# 2. **Merges the configuration** with existing NDFC settings.
+# 3. **Uses predefined interface configurations** from `interfaces.access`.
+#
+# This ensures that **host connections are properly configured** for network access.
+# ------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------- #
+# Task: Configure Host-Facing Access Interfaces                    #
+# ---------------------------------------------------------------- #
+# This task pushes the **access interface configuration** to the NDFC fabric. 
+# The `dcnm_interface` module ensures:
+# - Interfaces are provisioned with the correct settings.
+# - Configuration is merged with the current state in NDFC.
+# - Uses the `interfaces.access` variable for interface definitions.
+
+- name: Create Host Facing Access Interfaces On Leaf Switches
+  cisco.dcnm.dcnm_interface:
+    fabric: "{{ fabric_settings.FABRIC_NAME }}"  # Specify the fabric name
+    config: "{{ interfaces.access }}"           # Apply access interface configurations
+    state: merged                               # Merge configuration with existing settings

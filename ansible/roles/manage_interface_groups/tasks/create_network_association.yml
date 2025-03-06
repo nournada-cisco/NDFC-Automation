@@ -1,0 +1,39 @@
+# ------------------------------------------------------------------------------
+# Network Association with Interface Groups in Cisco NDFC
+# ------------------------------------------------------------------------------
+# This task file associates networks with interface groups in NDFC.
+#
+# - Uses `dcnm_rest` for API interactions.
+# - Ensures networks are properly linked to their groups.
+# - Supports multiple associations in a single execution.
+# ------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------- #
+# Task: Associate Networks with Interface Groups                   #
+# ---------------------------------------------------------------- #
+# This task loops over `interface_groups` and links networks to the respective
+# groups using the NDFC API.
+
+- name: Associate networks with interface groups in NDFC
+  cisco.dcnm.dcnm_rest:
+    method: POST
+    path: "/appcenter/cisco/ndfc/api/v1/lan-fabric/rest/control/fabrics/{{ fabric_name }}/groups/{{ item.name }}/netassoc"
+    json_data: "{{ item.networks | to_json }}"  # Convert list to JSON string
+  loop: "{{ interface_groups }}"
+  when: item.networks is defined and item.networks | length > 0
+  register: netassoc_response
+
+
+# ---------------------------------------------------------------- #
+# Task: Display API Response for Each Group Association            #
+# ---------------------------------------------------------------- #
+# Logs the API response after associating networks with their groups.
+
+- name: Display API response for each group association
+  ansible.builtin.debug:
+    msg: "Associated Networks {{ item.networks }} with Group: {{ item.name }}, Response: {{ item_response.json | default('No Response') }}"
+  loop: "{{ interface_groups }}"
+  loop_control:
+    loop_var: item_response
+  when: item.networks is defined and item.networks | length > 0
+

@@ -1,0 +1,25 @@
+---
+# This file is auto-generated
+# DO NOT EDIT MANUALLY
+#
+- vrf_name: mgs-in
+  vrf_id: 101100
+  vlan_id: 1100
+  attach:
+    - ip_address: 10.105.11.51
+    - ip_address: 10.105.11.52
+  deploy: false
+- vrf_name: infra
+  vrf_id: 100103
+  vlan_id: 103
+  attach:
+    - ip_address: 10.105.11.51
+    - ip_address: 10.105.11.52
+  deploy: false
+- vrf_name: internet
+  vrf_id: 101500
+  vlan_id: 1500
+  attach:
+    - ip_address: 10.105.11.51
+    - ip_address: 10.105.11.52
+  deploy: false

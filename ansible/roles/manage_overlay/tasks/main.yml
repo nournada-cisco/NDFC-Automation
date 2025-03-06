@@ -1,0 +1,83 @@
+---
+# ------------------------------------------------------------------------------
+# Manage Overlay - VRFs and Networks Configuration
+# ------------------------------------------------------------------------------
+# This task file is responsible for **adding and managing Overlay VRFs & Networks** 
+# in an NDFC-managed fabric.
+#
+# Actions performed:
+# 1. **Adds VRFs and Networks** to the overlay fabric.
+# 2. **(Optional) Resynchronizes local and external fabrics** before VRF-Lite deployment.
+# 3. **(Optional) Extends Overlay VRFs to VRF-Lite fabrics.**
+# 4. **(Optional) Manages and applies network policies.**
+#
+# This role enables **end-to-end connectivity** by configuring the overlay 
+# network infrastructure and ensuring **proper segmentation and reachability**.
+# ------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------- #
+# Task: Debug Role Execution                                       #
+# ---------------------------------------------------------------- #
+# This task logs the execution of the manage_overlay role for tracking purposes.
+
+- ansible.builtin.debug:
+    msg:
+      - "----------------------------------------------------------------"
+      - "+             Calling Role - [manage_overlay]                     +"
+      - "----------------------------------------------------------------"
+  tags:
+    - mo_vrfs_nets
+    - mo_vrf_lite
+    - mo_resync
+    - mo_networks
+    - mo_policies
+    - mo_all
+
+# ---------------------------------------------------------------- #
+# Task: Add Overlay VRFs and Networks                              #
+# ---------------------------------------------------------------- #
+# This task ensures:
+# - VRFs and Networks are added to the overlay fabric.
+# - Uses predefined configurations from `add_vrfs_networks.yml`.
+
+- name: Include Tasks To Add Overlay VRFs and Networks
+  ansible.builtin.import_tasks: add_vrfs_networks.yml
+  tags:
+    - mo_vrfs_nets
+    - mo_all
+
+# ---------------------------------------------------------------- #
+# Optional Tasks: Resync Fabric Before VRF-Lite Addition           #
+# ---------------------------------------------------------------- #
+# This section allows resynchronizing local and external fabrics 
+# before VRF-Lite configurations. Uncomment if needed.
+
+# - name: Include Tasks To Re-Sync Local and External Fabric Before Adding VRF Lite
+#   ansible.builtin.import_tasks: resync_fabric.yml
+#   tags:
+#     - mo_vrf_lite
+#     - mo_resync
+#     - mo_all
+
+# ---------------------------------------------------------------- #
+# Optional Tasks: Add Overlay VRFs to VRF-Lite Fabric Extensions  #
+# ---------------------------------------------------------------- #
+# This task extends overlay VRFs to external VRF-Lite fabrics. 
+# Uncomment if your deployment requires VRF-Lite.
+
+# - name: Include Tasks To Add Overlay VRFs To VRF Lite Fabric Extensions
+#   ansible.builtin.import_tasks: add_vrf_lite_vrfs.yml
+#   tags:
+#     - mo_vrf_lite
+#     - mo_all
+
+# ---------------------------------------------------------------- #
+# Optional Tasks: Manage Policies for Overlay VRFs and Networks    #
+# ---------------------------------------------------------------- #
+# This section is used for managing network policies. Uncomment if needed.
+
+# - name: Include Tasks To Manage Policies
+#   ansible.builtin.import_tasks: add_policies.yml
+#   tags:
+#     - mo_policies
+#     - mo_all

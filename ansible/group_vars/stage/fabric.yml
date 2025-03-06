@@ -1,0 +1,96 @@
+---
+# ------------------------------------------------------------------------------
+# Fabric Configuration File for NDFC
+# ------------------------------------------------------------------------------
+# This file contains variable data required for fabric provisioning in Cisco NDFC.
+#
+# It includes:
+# - **Fabric Settings**: General fabric parameters including BGP, VXLAN, and POAP.
+# - **Fabric Inventory**: Device inventory for all switches (spines, leaves, borders).
+# - **POAP Information**: Power-On Auto Provisioning settings for newly added devices.
+#
+# ------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------- #
+# Fabric Settings                                                  #
+# ---------------------------------------------------------------- #
+# This section defines the fabric-level settings for NDFC.
+# These settings control the fabric type, BGP AS number, and management configurations.
+
+fabric_settings:
+  DEPLOY: yes
+  FABRIC_NAME: GEN-01
+  FABRIC_TYPE: VXLAN_EVPN
+  BGP_AS: 61111
+  GRFIELD_DEBUG_FLAG: Enable
+  AUTO_SYMMETRIC_VRF_LITE: true
+  AAA_REMOTE_IP_ENABLED: false
+  DCI_SUBNET_RANGE: 10.31.0.0/16
+  VRF_LITE_AUTOCONFIG: Back2Back&ToExternal
+  BOOTSTRAP_ENABLE: true
+  DHCP_ENABLE: true
+  DHCP_IPV6_ENABLE: DHCPv4
+  DHCP_START: 10.15.0.100
+  DHCP_END: 10.15.0.101
+  MGMT_GW: 10.15.0.1+
+  MGMT_PREFIX: 24
+  BOOTSTRAP_MULTISUBNET: "10.15.28.100,10.15.28.101,10.15.28.1,24"
+
+# ---------------------------------------------------------------- #
+# Local Fabric Information                                         #
+# ---------------------------------------------------------------- #
+# This section defines the device inventory for the fabric.
+# Each device is specified with its management IP, role (spine, leaf, border),
+# and POAP (Power-On Auto Provisioning) details if applicable.
+
+fabric_inventory:
+  - seed_ip: 10.105.11.53
+    user_name: admin
+    password: cisco!123
+    max_hops: 0
+    role: spine
+    preserve_config: true
+  - seed_ip: 10.105.11.54
+    user_name: admin
+    password: cisco!123
+    max_hops: 0
+    role: spine
+    preserve_config: true
+  - seed_ip: 10.105.11.51
+    user_name: admin
+    password: cisco!123
+    max_hops: 0
+    role: leaf
+    preserve_config: true
+  - seed_ip: 10.105.11.52
+    user_name: admin
+    password: cisco!123
+    max_hops: 0
+    role: leaf
+    preserve_config: true
+  - seed_ip: 10.105.11.56
+    user_name: admin
+    password: cisco!123
+    max_hops: 0
+    role: leaf
+    preserve_config: true
+  - seed_ip: 10.105.11.57
+    user_name: admin
+    password: cisco!123
+    max_hops: 0
+    role: leaf
+    preserve_config: true
+
+  # Uncomment the following block to enable POAP for a border switch
+  # - seed_ip: 10.15.28.14
+  #   user_name: admin
+  #   password: cisco!123
+  #   role: border
+  #   poap:
+  #     - serial_number: 9IZOB1DARSA
+  #       model: N9K-C9300v
+  #       version: 9.3(8)
+  #       hostname: staging-leaf3
+  #       config_data:
+  #         modulesModel: [N9K-X9364v, N9K-vSUP]
+  #         gateway: 10.15.28.1/24

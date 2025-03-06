@@ -1,0 +1,59 @@
+#SPDX-License-Identifier: MIT-0
+---
+# ------------------------------------------------------------------------------
+# Deploy Configuration for Fabric in NDFC
+# ------------------------------------------------------------------------------
+# This task ensures that the latest configurations are saved and deployed 
+# to the fabric in Cisco NDFC.
+#
+# Actions performed:
+# 1. **Save Configuration**: Executes a config-save operation for the fabric.
+# 2. **Deploy Configuration**: Pushes the saved configuration to the fabric.
+#
+# This guarantees that any changes made in NDFC are **committed and deployed**
+# to the network devices.
+# ------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------- #
+# Task: Debug Role Execution                                       #
+# ---------------------------------------------------------------- #
+# Provides a debug message when the deployment role is executed.
+
+- ansible.builtin.debug:
+    msg:
+      - "----------------------------------------------------------------"
+      - "+             Calling Role - [deploy]                     +"
+      - "----------------------------------------------------------------"
+
+# ---------------------------------------------------------------- #
+# Block: Save and Deploy Fabric Configuration                     #
+# ---------------------------------------------------------------- #
+# This block ensures that the configuration is saved first before deployment.
+# Using a block helps in **better error handling** if needed.
+
+- block:
+    # ------------------------------------------------------------ #
+    # Task: Save Configuration in NDFC                            #
+    # ------------------------------------------------------------ #
+    # This API call triggers a **config-save** operation in NDFC, 
+    # which commits the running configuration for the fabric.
+
+    - name: Config-Save for Fabric {{ fabric_settings.FABRIC_NAME }}
+      cisco.dcnm.dcnm_rest:
+        method: POST  # HTTP POST request
+        path: "/appcenter/cisco/ndfc/api/v1/lan-fabric/rest/control/fabrics/{{ fabric_settings.FABRIC_NAME }}/config-save"
+
+    # ------------------------------------------------------------ #
+    # Task: Deploy Configuration in NDFC                          #
+    # ------------------------------------------------------------ #
+    # This API call triggers a **config-deploy** operation in NDFC, 
+    # ensuring the saved configuration is applied to the network.
+    # `forceShowRun=false` prevents forcing "show run" output during deployment.
+
+    - name: Deploy for Fabric {{ fabric_settings.FABRIC_NAME }}
+      cisco.dcnm.dcnm_rest:
+        path: "/appcenter/cisco/ndfc/api/v1/lan-fabric/rest/control/fabrics/{{ fabric_settings.FABRIC_NAME }}/config-deploy?forceShowRun=false"
+        method: POST  # HTTP POST request
+
+  tags:
+    - deploy  # Assigns the 'deploy' tag for targeted execution

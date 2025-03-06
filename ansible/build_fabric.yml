@@ -1,0 +1,31 @@
+---
+# Build VXLAN EVPN Fabric on NDFC
+# ----------------------------------------------------------------------------
+# This is the top-level Ansible playbook responsible for orchestrating the 
+# deployment of a VXLAN EVPN fabric using NDFC.
+#
+# It runs multiple Ansible roles to:
+# - Create the fabric
+# - Add network devices (inventory)
+# - Set up vPC peer links
+# - Configure interfaces (host-facing, vPC, loopback)
+# - Manage overlay configurations (VRFs, networks)
+# - Manage interface groups
+# - Deploy the final configuration
+#
+# The roles are currently commented out. Uncomment the necessary roles to
+# enable the corresponding tasks.
+# ----------------------------------------------------------------------------
+
+- name: Build VXLAN EVPN Fabric on NDFC
+  hosts: ndfc
+  gather_facts: false
+
+  roles:
+    # - create_fabric          # Create the VXLAN EVPN fabric in NDFC
+    # - add_inventory          # Add devices (spines, leaves, borders) to NDFC
+    # - setup_vpc              # Set up vPC peer links between leaf pairs
+    # - manage_interfaces      # Configure host-facing, vPC, and loopback interfaces
+    # - manage_overlay         # Configure overlay networks and VRFs
+    - manage_interface_groups # Manage interface groups for device automation
+    # - deploy                 # Save and deploy the final configuration in NDFC

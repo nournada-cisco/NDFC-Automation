@@ -1,0 +1,72 @@
+---
+# --------------------------------------------------------------------------
+# Automated VRF and network configuration for NDFC fabric
+# --------------------------------------------------------------------------
+# This task file is responsible for:
+# 1. **Generating and Storing VRF Configurations** from Jinja templates.
+# 2. **Generating and Storing Network Configurations** from Jinja templates.
+# 3. **Managing VRF configurations** in NDFC, ensuring consistency.
+# 4. **Managing Network configurations** in NDFC, ensuring proper segmentation.
+#
+# The configurations are dynamically created and applied to the fabric 
+# specified in `fabric_settings.FABRIC_NAME`. The `replaced` state ensures
+# that existing configurations are updated as needed.
+# --------------------------------------------------------------------------
+
+# --------------------------------------------------------------------
+# Create VRF configuration section
+# --------------------------------------------------------------------
+# This section:
+# - Generates a YAML file for VRF configurations using a Jinja2 template.
+# - Stores the generated configuration for later use.
+
+- name: Create file to hold rendered VRF information
+  ansible.builtin.template:
+    src: attach_vrfs.j2   # Template file for VRFs
+    dest: "{{ role_path }}/files/attach_vrfs.yml"  # Output location
+
+- name: Create and store generated VRF configuration
+  ansible.builtin.set_fact:
+    vrf_config: "{{ lookup('file', 'attach_vrfs.yml') | from_yaml }}"
+
+# --------------------------------------------------------------------
+# Create network configuration section
+# --------------------------------------------------------------------
+# This section:
+# - Generates a YAML file for network configurations using a Jinja2 template.
+# - Stores the generated configuration for later use.
+
+- name: Create file to hold rendered Network information
+  ansible.builtin.template:
+    src: attach_networks.j2   # Template file for Networks
+    dest: "{{ role_path }}/files/attach_nets.yml"  # Output location
+
+- name: Create and store generated Network configuration
+  ansible.builtin.set_fact:
+    net_config: "{{ lookup('file', 'attach_nets.yml') | from_yaml }}"
+
+# --------------------------------------------------------------------
+# Apply VRF configuration to NDFC
+# --------------------------------------------------------------------
+# This section:
+# - Deploys the VRF configurations to the fabric in NDFC.
+# - Ensures that the VRFs are applied using the 'replaced' state.
+
+- name: Manage NDFC Fabric VRFs
+  cisco.dcnm.dcnm_vrf:
+    fabric: "{{ fabric_settings.FABRIC_NAME  }}"
+    state: replaced  # Ensures any existing VRFs are updated
+    config: "{{ vrf_config }}"  # Uses the stored VRF configuration
+
+# --------------------------------------------------------------------
+# Apply network configuration to NDFC
+# --------------------------------------------------------------------
+# This section:
+# - Deploys the network configurations to the fabric in NDFC.
+# - Ensures that the networks are applied using the 'replaced' state.
+
+- name: Manage NDFC Fabric Networks
+  cisco.dcnm.dcnm_network:
+    fabric: "{{ fabric_settings.FABRIC_NAME }}"
+    state: replaced  # Ensures any existing networks are updated
+    config: "{{ net_config }}"  # Uses the stored network configuration

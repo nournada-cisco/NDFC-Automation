@@ -1,0 +1,65 @@
+# Managing vPC Peers
+# ----------------------------------------------------------------------------
+# This playbook is responsible for configuring vPC peer links between leaf switches.
+# It consists of the following tasks:
+# 1. (Optional) Enable peer link interfaces as trunks on leaf switches.
+# 2. Create vPC peers between leaf switch pairs using the `dcnm_vpc_pair` module.
+#
+# The vPC peer links are established by pairing consecutive leaf switches in the 
+# `fabric_inventory` list.
+# ----------------------------------------------------------------------------
+
+# --------------------------------------------------------------------
+# Enable Peer Link Interfaces as Trunks (Commented Out)
+# --------------------------------------------------------------------
+# This optional section enables the peer link interfaces (e.g., eth1/30) as 
+# trunk ports on the leaf switches before creating the vPC peers.
+# Uncomment this section if needed.
+
+# - name: Enable Peer Link Interfaces as Trunks
+#   cisco.dcnm.dcnm_interface:
+#     fabric: "{{ fabric_settings.FABRIC_NAME }}"
+#     config:
+#       - name: eth1/30
+#         type: eth
+#         admin_state: true
+#         switch:
+#           - "{{ item.seed_ip }}"
+#         profile:
+#           mode: trunk
+#       - name: eth1/30
+#         type: eth
+#         admin_state: true
+#         switch:
+#           - "{{ item.seed_ip }}"
+#         profile:
+#           mode: trunk
+#     state: merged
+#   ignore_errors: true
+#   loop: "{{ fabric_inventory }}"
+#   when: item.role == 'leaf'
+#   # no_log: true
+
+# --------------------------------------------------------------------
+# Create vPC Peers Between Leaf Switch Pairs
+# --------------------------------------------------------------------
+# This task:
+# - Iterates through the list of leaf switches from `fabric_inventory`.
+# - Groups consecutive leaf switches into vPC peer pairs.
+# - Uses the `dcnm_vpc_pair` module to establish the vPC peer links.
+# - Prevents redundant or incorrect pairings by ensuring only valid pairs are created.
+
+- name: Create vPC Peers Between Leaf Switch Pairs
+  cisco.dcnm.dcnm_vpc_pair:
+    src_fabric: "{{ fabric_settings.FABRIC_NAME }}"
+    deploy: false
+    state: merged
+    config: >-
+      {%- set vpc_leafs = fabric_inventory | selectattr('role', 'eq', 'leaf') | list -%}
+      {%- set vpc_peers = [] -%}
+      {%- for i in range(0, vpc_leafs | length, 2) -%}
+        {%- if i + 1 < vpc_leafs | length -%}
+          {%- set _ = vpc_peers.append(dict(peerOneId=vpc_leafs[i].seed_ip, peerTwoId=vpc_leafs[i+1].seed_ip)) -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {{ vpc_peers }}

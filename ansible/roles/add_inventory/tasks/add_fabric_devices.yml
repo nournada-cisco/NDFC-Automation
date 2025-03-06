@@ -1,0 +1,23 @@
+---
+# ------------------------------------------------------------------------------
+# Add Switches to Fabric in NDFC
+# ------------------------------------------------------------------------------
+# This task registers switches to the specified NDFC fabric.
+#
+# It performs the following actions:
+# - **Filters out POAP devices**: Ensures only manually defined devices 
+#   (excluding POAP-provisioned devices) are added.
+# - **Adds switches to the fabric**: Uses the `cisco.dcnm.dcnm_inventory` module.
+# - **Deploys changes**: Saves the inventory updates in NDFC.
+#
+# This ensures that all switches (except POAP devices) are correctly added 
+# to the NDFC fabric inventory.
+# ------------------------------------------------------------------------------
+
+- name: Add switches to Fabric {{ fabric_settings.FABRIC_NAME }} in NDFC
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ fabric_settings.FABRIC_NAME }}"  # Fabric name from variables
+    config: "{{ fabric_inventory | selectattr('poap', 'undefined') | list }}"  # Exclude POAP devices
+    deploy: false   # Do not deploy configuration immediately
+    save: true      # Save inventory updates in NDFC
+    state: merged   # Merge with existing inventory without removing other devices

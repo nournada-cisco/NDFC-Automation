@@ -1,0 +1,74 @@
+---
+# ------------------------------------------------------------------------------
+# Interface Management Tasks for Cisco NDFC
+# ------------------------------------------------------------------------------
+# This task file is responsible for managing different types of network interfaces 
+# within the Cisco NDFC environment. It imports various subtasks that handle:
+# 
+# 1. **Host-Facing Interfaces** (`host_interfaces.yml`) – Configures interfaces 
+#    used by end devices like servers.
+# 2. **vPC Interfaces** (`vpc_interfaces.yml`) – Manages Virtual Port-Channel (vPC) 
+#    configurations for redundant links.
+# 3. **Loopback Interfaces** (Currently commented out) – Configures loopback 
+#    interfaces, typically for routing or monitoring purposes.
+#
+# This file is structured to support modular execution through Ansible tags.
+# ------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------- #
+# Task: Debug Role Execution                                       #
+# ---------------------------------------------------------------- #
+# Provides a debug message to indicate when the `manage_interfaces` role is executed.
+
+- ansible.builtin.debug:
+    msg:
+      - "----------------------------------------------------------------"
+      - "+             Calling Role - [manage_interfaces]               +"
+      - "----------------------------------------------------------------"
+  tags:
+    - mi_hosts      # Applies to host-facing interface tasks
+    - mi_vpc        # Applies to vPC interface tasks
+    - mi_loopback   # Applies to loopback interface tasks
+    - mi_all        # Applies to all interface-related tasks
+
+# ---------------------------------------------------------------- #
+# Task: Manage Host-Facing Interfaces                             #
+# ---------------------------------------------------------------- #
+# This task imports `host_interfaces.yml`, which contains configurations for 
+# interfaces connected to hosts, such as access ports.
+
+- name: Include Tasks To Manage Host Facing Interfaces
+  ansible.builtin.import_tasks: host_interfaces.yml
+  tags:
+    - mi_hosts  # Assign to host interface-related tasks
+    - mi_all    # Assign to all interface-related tasks
+
+# ---------------------------------------------------------------- #
+# Task: Manage vPC Interfaces                                      #
+# ---------------------------------------------------------------- #
+# This task imports `vpc_interfaces.yml`, which contains configurations for 
+# vPC (Virtual Port-Channel) interfaces, ensuring redundancy and stability 
+# between switches.
+
+- name: Include Tasks To Manage vPC Interfaces
+  ansible.builtin.import_tasks: vpc_interfaces.yml
+  tags:
+    - mi_vpc  # Assign to vPC interface-related tasks
+    - mi_all  # Assign to all interface-related tasks
+
+# ---------------------------------------------------------------- #
+# Task: Manage Loopback Interfaces (Commented Out)                #
+# ---------------------------------------------------------------- #
+# This task is currently disabled but can be enabled if loopback interfaces 
+# need to be managed.
+#
+# Loopback interfaces are often used for:
+# - Routing protocols (e.g., BGP, OSPF)
+# - Management traffic
+# - Monitoring and analytics
+
+# - name: Include Tasks To Manage Loopback Interfaces
+#   ansible.builtin.import_tasks: loopback_interfaces.yml
+#   tags:
+#     - mi_loopback  # Assign to loopback interface-related tasks
+#     - mi_all       # Assign to all interface-related tasks

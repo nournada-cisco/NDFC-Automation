@@ -1,0 +1,35 @@
+# ------------------------------------------------------------------------------
+# Overlay VRF and Network Attachment Configuration for NDFC
+# ------------------------------------------------------------------------------
+# This file contains overlay-specific variables used for attaching VRFs to 
+# border leaf switches and associating networks with interface groups.
+#
+# It includes:
+# - **VRF Attachment**: Specifies the leaf switches to which VRFs will be attached.
+# - **Network Attachment**: Defines the interface groups and physical ports 
+#   used to connect networks to fabric devices.
+#
+# These configurations ensure proper segmentation and connectivity between 
+# internal and external networks in the NDFC-managed fabric.
+# ------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------- #
+# VRF Attachment Configuration                                     #
+# ---------------------------------------------------------------- #
+vrf_attach_group:
+  all_leaf:
+    - ip_address: 10.105.11.51
+    - ip_address: 10.105.11.52
+
+# ---------------------------------------------------------------- #
+# Network Attachment Configuration                                 #
+# ---------------------------------------------------------------- #
+attach_group:
+  esxi:
+    - ip_address: 10.105.11.51
+      ports:
+        - Port-channel10
+    - ip_address: 10.105.11.52
+      ports:
+        - Port-channel10
+ 

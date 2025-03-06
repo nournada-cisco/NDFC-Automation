@@ -1,0 +1,164 @@
+# ------------------------------------------------------------------------------
+# Interface Configuration File for NDFC
+# ------------------------------------------------------------------------------
+# This file contains the interface variable data for provisioning Virtual Port 
+# Channel (vPC) interfaces, access interfaces, and interface groups to Cisco NDFC.
+#
+# - The `vpc` section defines vPC interfaces that span two switches.
+# - The `access` section defines standalone Ethernet interfaces.
+# - The `interface_groups` section configures interface groups for use in NDFC.
+# 
+# This file is used in Ansible automation workflows for network configuration 
+# deployment in a fabric managed by Cisco NDFC.
+# ------------------------------------------------------------------------------
+
+
+interfaces:
+  # ---------------------------------------------------------------- #
+  # VPC Interface List                                               #
+  # ---------------------------------------------------------------- #
+  vpc:
+    - name: vpc10
+      type: vpc
+      switch:
+        - 10.105.11.51
+        - 10.105.11.52
+      deploy: false
+      profile:
+        admin_state: true
+        mode: trunk
+        peer1_members:
+          - e1/40
+        peer2_members:
+          - e1/40
+        pc_mode: active
+        bpdu_guard: true
+        port_type_fast: true
+        mtu: jumbo
+        description: "vPC40 on eth1/32"
+        cmds:
+          - no lacp suspend-individual 
+        peer1_cmds:
+          - lacp rate fast  
+        peer2_cmds:
+          - lacp rate fast 
+
+    - name: vpc11
+      type: vpc
+      switch:
+        - 10.105.11.56
+        - 10.105.11.57
+      deploy: false
+      profile:
+        admin_state: true
+        mode: trunk
+        peer1_members:
+          - e1/40
+        peer2_members:
+          - e1/40
+        pc_mode: active
+        bpdu_guard: true
+        port_type_fast: true
+        mtu: jumbo
+        description: "vPC41 on eth1/33"
+      
+  # ---------------------------------------------------------------- #
+  # Access Interface List                                            #
+  # ---------------------------------------------------------------- #
+  access:
+  - name: eth1/32
+    type: eth
+    switch:
+      - 10.105.11.51
+    deploy: true
+    profile:
+      admin_state: true
+      mode: routed
+      description: "Changed test"
+
+  - name: eth1/32
+    type: eth
+    switch:
+      - 10.105.11.52
+    deploy: true
+    profile:
+      admin_state: true
+      mode: routed
+      description: "Changed test"
+
+  - name: eth1/32
+    type: eth
+    switch:
+      - 10.105.11.56
+    deploy: true
+    profile:
+      admin_state: true
+      mode: routed
+      description: "Changed test"
+
+  - name: eth1/32
+    type: eth
+    switch:
+      - 10.105.11.57
+    deploy: true
+    profile:
+      admin_state: true
+      mode: routed
+      description: "Changed test"
+
+  # - name: eth1/40
+  #   type: eth
+  #   switch:
+  #     - 10.105.11.51
+  #   deploy: false
+  #   profile:
+  #     admin_state: true
+  #     mode: routed
+  #     description: "Changed 1"
+  #     cmds:
+  #       - lacp rate fast
+
+    # - name: eth1/11
+    #   type: eth
+    #   switch:
+    #     - 10.105.11.51
+    #   deploy: true
+    #   profile:
+    #     admin_state: true
+    #     mode: access
+    #     speed: auto
+    #     bpdu_guard: false
+    #     port_type_fast: true
+    #     mtu: jumbo
+    #     access_vlan: 2301
+    #     cmds:
+    #       - no shutdown
+    #     description: "VLAN 2301 Access Interface ------ Test2"
+
+
+
+# ------------------------------------------------------------------------------
+# Interface Group API Info
+# ------------------------------------------------------------------------------
+# This section defines interface groups that can be used in NDFC to organize 
+# and manage related interfaces. These groups can be assigned to specific 
+# networks for automation purposes.
+# ------------------------------------------------------------------------------
+ndfc_host: "10.105.11.145"
+ndfc_username: "admin"
+ndfc_password: "Cisco@123"
+fabric_name: "GEN-01"
+interface_groups:
+  - name: "TestGroup5"
+    type: "vPC"
+    networks:
+      - "aead3-hsm-data"
+  - name: "TestGroup6"
+    type: "Ethernet"
+    networks:
+      - "aead3-hsm-data"
+  - name: "TestGroup7"
+    type: "Port-Channel"
+    networks:
+      - "aead3-osp-com-int-api"
+

@@ -1,0 +1,39 @@
+#SPDX-License-Identifier: MIT-0
+---
+# ------------------------------------------------------------------------------
+# Add Inventory Task File for NDFC Automation
+# ------------------------------------------------------------------------------
+# This file contains the tasks required to add network devices (spines, leaves, 
+# and border nodes) to the NDFC inventory for fabric provisioning.
+#
+# It includes:
+# - **Debug Information**: Outputs debug messages when executing this role.
+# - **Device Addition Tasks**: Calls a separate task file to add devices to the 
+#   local fabric inventory.
+#
+# This role ensures that all devices are registered with NDFC before deploying 
+# fabric configurations.
+# ------------------------------------------------------------------------------
+
+- ansible.builtin.debug:
+    msg:
+      - "----------------------------------------------------------------"
+      - "+             Calling Role - [add_inventory]                   +"
+      - "----------------------------------------------------------------"
+  tags:
+    - ai_fabric       # Applies to fabric inventory tasks
+    - ai_all          # Applies to all inventory-related tasks
+
+
+# ---------------------------------------------------------------- #
+# Task: Add Devices to Local Fabric                                #
+# ---------------------------------------------------------------- #
+# This task includes the `add_fabric_devices.yml` file, which contains 
+# the logic to register new devices into the NDFC fabric inventory.
+
+- name: Include Tasks to Add Devices to Local Fabric
+  ansible.builtin.import_tasks: add_fabric_devices.yml
+  tags:
+    - ai_fabric
+    - ai_all
+

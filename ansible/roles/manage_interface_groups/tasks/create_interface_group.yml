@@ -1,0 +1,44 @@
+# ------------------------------------------------------------------------------
+# Interface Group Creation in Cisco NDFC
+# ------------------------------------------------------------------------------
+# This task file creates multiple interface groups in NDFC. 
+#
+# - Uses `dcnm_rest` to interact with NDFC.
+# - Each interface group is assigned relevant settings such as:
+#   - BPDU Guard
+#   - PortFast
+#   - Jumbo MTU
+# - Supports vPC, Ethernet, and Port-Channel groups.
+# ------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------- #
+# Task: Create Multiple Interface Groups in NDFC                   #
+# ---------------------------------------------------------------- #
+# This task loops over the `interface_groups` list and creates each group 
+# with the specified settings in NDFC.
+
+- name: Create multiple interface groups in NDFC
+  cisco.dcnm.dcnm_rest:
+    method: POST
+    path: "/appcenter/cisco/ndfc/api/v1/lan-fabric/rest/control/fabrics/{{ fabric_name }}/groups/{{ item.name }}?group-type={{ item.type }}"
+    json_data: "{{ {'nvPairs': {
+                    'BPDUGUARD_ENABLED': 'no',
+                    'IG_FOR_FEX': 'false',
+                    'PORTTYPE_FAST_ENABLED': 'true',
+                    'MTU': 'jumbo',
+                    'SPEED': 'Auto',
+                    'AUTO_NEG': 'on'
+                }} | to_json }}"
+  loop: "{{ interface_groups }}"
+  register: response
+
+
+# ---------------------------------------------------------------- #
+# Task: Display API Response for Each Group                        #
+# ---------------------------------------------------------------- #
+# Logs the API response for each created interface group.
+
+- name: Display API response for each group
+  ansible.builtin.debug:
+    msg: "Created Group: {{ item.name }}, Response: {{ response.results | default([]) | list }}"
+  with_items: "{{ interface_groups }}"

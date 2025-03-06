@@ -1,0 +1,32 @@
+---
+# ------------------------------------------------------------------------------
+# vPC Interface Configuration for Leaf Switches
+# ------------------------------------------------------------------------------
+# This task file provisions **vPC (Virtual Port-Channel) interfaces** on 
+# designated leaf switches within the NDFC-managed fabric.
+#
+# Actions performed:
+# 1. **Configures vPC interfaces** between Leaf1 and Leaf2.
+# 2. **Ensures interface settings** (e.g., trunk mode, LACP, MTU) are applied.
+# 3. **Merges the configuration** with existing NDFC settings.
+#
+# vPC is used for:
+# - **Redundancy & Load Balancing** – Provides dual-active links to devices.
+# - **Increased Availability** – Prevents STP blocking by utilizing both links.
+# - **Scalability** – Supports more resilient network designs.
+# ------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------- #
+# Task: Configure vPC Interfaces on Leaf Switches                 #
+# ---------------------------------------------------------------- #
+# This task pushes the **vPC interface configuration** to the NDFC fabric. 
+# The `dcnm_interface` module ensures:
+# - vPC interfaces are properly defined.
+# - Configuration is merged with the current state in NDFC.
+# - Uses the `interfaces.vpc` variable for interface definitions.
+
+- name: Create vPC Interfaces on Leaf Switches
+  cisco.dcnm.dcnm_interface:
+    fabric: "{{ fabric_settings.FABRIC_NAME }}"  # Specify the fabric name
+    config: "{{ interfaces.vpc }}"              # Apply vPC interface configurations
+    state: merged                               # Merge configuration with existing settings

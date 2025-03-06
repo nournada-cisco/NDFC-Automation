@@ -1,0 +1,198 @@
+##############################################
+##                 SETUP                    ##
+##############################################
+
+- set_fact:
+    rest_path: "/rest/control/fabrics/{{ ansible_it_fabric }}"
+  when: controller_version == "11"
+
+- set_fact:
+    rest_path: "/appcenter/cisco/ndfc/api/v1/lan-fabric/rest/control/fabrics/{{ ansible_it_fabric }}"
+  when: controller_version >= "12"
+
+- name: QUERY - Verify if fabric is deployed.
+  cisco.dcnm.dcnm_rest:
+    method: GET
+    path: "{{ rest_path }}"
+  register: result
+
+- assert:
+    that:
+    - 'result.response.DATA != None'
+
+- name: QUERY - setup - Clean up any existing devices
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: deleted
+
+- name: QUERY - Merge a Switch using GreenField Deployment
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: merged
+    config:
+    - seed_ip: "{{ ansible_switch1 }}"
+      auth_proto: MD5 # choose from [MD5, SHA, MD5_DES, MD5_AES, SHA_DES, SHA_AES]
+      user_name: "{{ switch_username }}"
+      password: "{{ switch_password }}"
+      max_hops: 0
+      role: leaf # default is Leaf - choose from [Leaf, Spine, Border, Border Spine, Border Gateway, Border Gateway Spine
+                       # Super Spine, Border Super Spine, Border Gateway Super Spine]
+      preserve_config: False # boolean, default is  true
+  register: result
+
+- assert:
+    that:
+    - 'result.changed == true'
+
+- assert:
+    that:
+      - 'item["RETURN_CODE"] == 200'
+  loop: '{{ result.response }}'
+
+
+#############################################
+#                QUERY                     ##
+#############################################
+
+- name: QUERY - Query a Switch - Hostname and Role must match
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: query
+    config:
+    - seed_ip: "{{ ansible_switch1 }}"
+      role: leaf # default is Leaf - choose from [Leaf, Spine, Border, Border Spine, Border Gateway, Border Gateway Spine
+                       # Super Spine, Border Super Spine, Border Gateway Super Spine]
+  register: result
+
+- assert:
+    that:
+    - 'result.response[0].ipAddress == "{{ ansible_switch1 }}"'
+    - 'result.response[0].switchRole == "leaf"'
+
+- name: QUERY - Query a Switch without a config element
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: query
+  register: result
+
+- assert:
+    that:
+    - 'result.response[0].ipAddress == "{{ ansible_switch1 }}"'
+    - 'result.response[0].switchRole == "leaf"'
+
+- name: QUERY - Query a Switch without role - Role does not need to match
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: query
+    config:
+    - seed_ip: "{{ ansible_switch1 }}"
+  register: result
+
+- assert:
+    that:
+    - 'result.response[0].ipAddress == "{{ ansible_switch1 }}"'
+
+- name: QUERY - Query a Switch without seed ip - Seed IP does not need to match
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: query
+    config:
+    - role: leaf # default is Leaf - choose from [Leaf, Spine, Border, Border Spine, Border Gateway, Border Gateway Spine
+                 # Super Spine, Border Super Spine, Border Gateway Super Spine]
+  register: result
+
+- assert:
+    that:
+     - 'result.response[0].switchRole == "leaf"'
+
+- name: QUERY - Query a Switch with wrong role
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: query
+    config:
+    - seed_ip: "{{ ansible_switch1 }}"
+      role: spine # default is Leaf - choose from [Leaf, Spine, Border, Border Spine, Border Gateway, Border Gateway Spine
+                       # Super Spine, Border Super Spine, Border Gateway Super Spine]
+  register: result
+
+- assert:
+    that:
+    - '"The queried switch is not part of the fabric configured" in result.response'
+
+- name: QUERY - Delete all Switch without config element
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: deleted
+  register: result
+
+- assert:
+    that:
+    - 'result.changed == true'
+    - 'result.response[0].RETURN_CODE == 200'
+
+- name: QUERY - Query a non available Switch
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: query
+    config:
+    - seed_ip: "{{ ansible_switch1 }}"
+      role: leaf # default is Leaf - choose from [Leaf, Spine, Border, Border Spine, Border Gateway, Border Gateway Spine
+                       # Super Spine, Border Super Spine, Border Gateway Super Spine]
+  register: result
+
+- assert:
+    that:
+    - '"The queried switch is not part of the fabric configured" in result.response'
+
+- name: Add Switch with Border Gateways and MD5 to fabric
+  cisco.dcnm.dcnm_inventory: &conf_role
+    fabric: "{{ ansible_it_fabric }}"
+    state: merged
+    config:
+    - seed_ip: "{{ ansible_switch1  }}"
+      max_hops: 0
+      preserve_config: false
+      role: border_gateway
+      auth_proto: MD5
+      user_name: "{{ switch_username }}"
+      password: "{{ switch_password }}"
+    - seed_ip: "{{ ansible_switch2 }}"
+      max_hops: 0
+      preserve_config: false
+      role: border_gateway
+      auth_proto: MD5
+      user_name: "{{ switch_username }}"
+      password: "{{ switch_password }}"
+  register: result
+
+
+- assert:
+    that:
+    - 'result.changed == true'
+
+- assert:
+    that:
+      - 'item["RETURN_CODE"] == 200'
+  loop: '{{ result.response }}'
+
+- name: QUERY - Query a Switch without a config element
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: query
+  register: result
+
+- assert:
+    that:
+    - '"{{ ansible_switch2 }}" or "{{ ansible_switch1 }}" in result.response[0].ipAddress'
+    - 'result.response[0].switchRole == "border gateway"'
+    - '"{{ ansible_switch2 }}" or "{{ ansible_switch1 }}" in result.response[1].ipAddress'
+    - 'result.response[1].switchRole == "border gateway"'
+
+##############################################
+##                 CLEAN-UP                 ##
+##############################################
+
+- name: QUERY - cleanup - Clean up any existing devices
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ ansible_it_fabric }}"
+    state: deleted

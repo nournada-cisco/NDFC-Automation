@@ -1,0 +1,25 @@
+---
+# Connection Information for Staging Fabric
+# ----------------------------------------------------------------------------
+# This file defines how Ansible will connect to NDFC.
+#
+# - Specifies the NDFC controller IP address
+# - Configures Ansible to use HTTPAPI for communication
+# - Enables SSL for secure connections but disables certificate validation
+# - Uses the Cisco DCNM Ansible network plugin
+# - Defines credentials for authenticating with NDFC
+# ----------------------------------------------------------------------------
+
+ndfc:
+  children:
+    stage:
+      hosts:
+        10.105.11.145:  # NDFC IP address
+          ansible_connection: ansible.netcommon.httpapi  # Use HTTPAPI for connectivity
+          ansible_httpapi_use_ssl: true  # Enable SSL for secure communication
+          ansible_httpapi_validate_certs: false  # Disable certificate validation (for self-signed certs)
+          ansible_python_interpreter: auto_silent  # Automatically select the Python interpreter
+          ansible_network_os: cisco.dcnm.dcnm  # Define Cisco DCNM as the network OS
+          ansible_user: admin  # NDFC username
+          ansible_password: Cisco@123  # NDFC password (can use Ansible Vault for security)
+

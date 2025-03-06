@@ -1,0 +1,85 @@
+---
+# ------------------------------------------------------------------------------
+# VXLAN EVPN Fabric Creation and Management in NDFC
+# ------------------------------------------------------------------------------
+# This task checks if the fabric already exists in NDFC. If it does not exist, 
+# it uses the `dcnm_fabric` module to create the fabric based on variable data 
+# from `group_vars/staging/fabric.yml`.
+#
+# This ensures that fabric creation is **idempotent**, meaning it only runs if 
+# the fabric is missing, preventing duplicate fabric definitions.
+# ------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------- #
+# Task: Query NDFC for Existing Fabric                            #
+# ---------------------------------------------------------------- #
+# This task retrieves the current fabric list from NDFC and checks if the 
+# specified fabric (`FABRIC_NAME`) already exists.
+
+- name: Query NDFC for Fabric
+  cisco.dcnm.dcnm_fabric:
+    state: query
+    config:
+      - FABRIC_NAME: "{{ fabric_settings.FABRIC_NAME }}"
+  register: create_fabric_result
+  tags:
+    - cf_vxlan
+    - cf_external
+    - cf_poap
+    - cf_all
+
+# ---------------------------------------------------------------- #
+# Task: Initialize Fabric Creation Flag                            #
+# ---------------------------------------------------------------- #
+# This flag (`create_fabric_flag`) determines whether the fabric should be 
+# created or not.
+
+- name: Intialize create_fabric_flag
+  ansible.builtin.set_fact:
+    create_fabric_flag: true
+
+# ---------------------------------------------------------------- #
+# Task: Check If Fabric Exists                                    #
+# ---------------------------------------------------------------- #
+# This task loops through the fabric query results. If a fabric with the 
+# same name is found, it sets the `create_fabric_flag` to `false` to prevent 
+# re-creation.
+
+- name: Check If Fabric Exists in NDFC
+  ansible.builtin.set_fact:
+    create_fabric_flag: false
+  when: item.fabricName == fabric_settings.FABRIC_NAME
+  loop: "{{ create_fabric_result.response | json_query('[].DATA[]') }}"
+  loop_control:
+    label: "{{ item.fabricName }}"
+
+# ---------------------------------------------------------------- #
+# Task: Log If Fabric Already Exists                              #
+# ---------------------------------------------------------------- #
+# This debug task logs that the fabric already exists and will not be created.
+
+- name: Check If Fabric Exists in NDFC Log
+  ansible.builtin.debug:
+    msg: "Fabric {{ fabric_settings.FABRIC_NAME }} Already Exists"
+  when: not create_fabric_flag
+
+
+# ---------------------------------------------------------------- #
+# Task: Create Fabric in NDFC (If Needed)                         #
+# ---------------------------------------------------------------- #
+# This task is currently commented out. If enabled, it will create the fabric 
+# only if `create_fabric_flag` is still `true` (i.e., the fabric does not exist).
+#
+# Uncomment the following block if you want to automatically create the fabric 
+# when it does not exist.
+
+# - name: Create Fabric {{ fabric_settings.FABRIC_NAME }} in NDFC
+#   cisco.dcnm.dcnm_fabric:
+#     state: merged  # Merge the new fabric with existing configurations
+#     config: ["{{ fabric_settings }}"]  # Use settings from fabric.yml
+#   when: create_fabric_flag  # Only create if fabric is missing
+# - name: Create Fabric {{ fabric_settings.FABRIC_NAME }} in NDFC
+#   cisco.dcnm.dcnm_fabric:
+#     state: merged
+#     config: ["{{ fabric_settings }}"]
+#   when: create_fabric_flag

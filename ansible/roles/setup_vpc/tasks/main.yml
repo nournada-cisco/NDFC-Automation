@@ -1,0 +1,84 @@
+# SPDX-License-Identifier: MIT-0
+---
+# --------------------------------------------------------------------------
+# Setup vPC peer links in NDFC fabric
+# --------------------------------------------------------------------------
+# This task file is responsible for:
+# 1. Querying the fabric to check vPC configuration on leaf switches.
+# 2. Determining whether vPC needs to be configured based on existing settings.
+# 3. Setting up vPC peer links between consecutive leaf switches in the fabric.
+#
+# The setup process ensures that vPC pairs are created only when necessary, 
+# preventing redundant configurations.
+# --------------------------------------------------------------------------
+
+# --------------------------------------------------------------------
+# Debugging information
+# --------------------------------------------------------------------
+# Displays a message indicating the role execution for logging purposes.
+
+- ansible.builtin.debug:
+    msg:
+      - "----------------------------------------------------------------"
+      - "+             Calling Role - [setup_vpc]                       +"
+      - "----------------------------------------------------------------"
+  tags: vpc_all
+
+# --------------------------------------------------------------------
+# Query fabric to check vPC configuration on leaf switches
+# --------------------------------------------------------------------
+# This task:
+# - Collects inventory details of all leaf switches.
+# - Registers the current vPC configuration state for each leaf.
+
+- name: Query Fabric {{ fabric_settings.FABRIC_NAME }} Leafs for vPC Configuration
+  cisco.dcnm.dcnm_inventory:
+    fabric: "{{ fabric_settings.FABRIC_NAME }}"
+    state: query
+    config: >-
+        {%- set seed_ip_list = [] -%}
+        {%- for switch in fabric_inventory | default([]) -%}
+        {%- if switch.role == 'leaf' -%}
+        {%- set _ = seed_ip_list.append(dict(seed_ip=switch.seed_ip)) -%}
+        {%- endif -%}
+        {%- endfor -%}
+        {{ seed_ip_list }}
+  register: query_result
+  tags: vpc_all
+
+# --------------------------------------------------------------------
+# Determine if vPC setup is needed
+# --------------------------------------------------------------------
+# This section:
+# - Initializes `setup_vpc` to `True` (default: assume setup is required).
+# - If vPC pairs are already configured, it updates `setup_vpc` to `False`.
+
+- name: Set Setup vPC Flag to Default True
+  ansible.builtin.set_fact:
+    setup_vpc: True
+  tags: vpc_all
+
+- name: Set Setup vPC Flag to False If vPC Pair Is Already Configured
+  ansible.builtin.set_fact:
+    setup_vpc: False
+  when: item.isVpcConfigured == true
+  loop: "{{ query_result.response }}"
+  loop_control:
+    label: "{{ item.isVpcConfigured }}"
+  tags: vpc_all
+
+# Debugging message to display whether vPC setup will proceed
+- ansible.builtin.debug: 
+    msg: "Setup vPC flag is - {{ setup_vpc }}"
+  tags: vpc_all
+
+# --------------------------------------------------------------------
+# Create vPC peer links if required
+# --------------------------------------------------------------------
+# If `setup_vpc` is `True`, this task imports `setup_vpc_peer.yml` to 
+# configure vPC peer links between the leaf switches.
+
+- name: Include Tasks To Create vPC Peers Between Two Leaves
+  ansible.builtin.import_tasks: setup_vpc_peer.yml
+  when: setup_vpc
+  tags: vpc_all
